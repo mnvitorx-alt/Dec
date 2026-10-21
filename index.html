@@ -1,204 +1,194 @@
-
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Eu te amo ❤️</title>
+  <title>Eu te amo</title>
 
   <style>
     * {
-      margin: 0;
-      padding: 0;
       box-sizing: border-box;
     }
 
     body {
-      background: #050505;
+      margin: 0;
       min-height: 100vh;
-      overflow: hidden;
+      background: #000;
+      color: #fff;
+      font-family: Georgia, "Times New Roman", serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: Arial, sans-serif;
+      overflow: hidden;
     }
 
-    /* FRASE INICIAL */
     #frase {
-      color: white;
-      font-size: clamp(38px, 10vw, 65px);
-      font-weight: bold;
+      font-size: clamp(32px, 8vw, 60px);
+      text-align: center;
       cursor: pointer;
       user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      text-shadow: 0 0 15px rgba(255, 255, 255, 0.25);
-      transition: transform 0.2s;
-      position: relative;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      padding: 20px;
       z-index: 2;
     }
 
-    #frase:active {
-      transform: scale(0.92);
+    #frase:hover {
+      text-shadow: 0 0 20px #d9a3ff;
     }
 
-    /* EXPLOSÃO DOS CONFETES */
-    .confete {
-      position: fixed;
-      display: block;
-      left: 0;
-      top: 0;
-      pointer-events: none;
-      will-change: transform, opacity;
-      animation: explodir var(--duracao) ease-out forwards;
-    }
-
-    @keyframes explodir {
-      0% {
-        transform: translate(0, 0) rotate(0deg) scale(1);
-        opacity: 1;
-      }
-
-      20% {
-        opacity: 1;
-      }
-
-      100% {
-        transform: translate(var(--x), var(--y))
-                   rotate(var(--giro)) scale(0.5);
-        opacity: 0;
-      }
-    }
-
-    /* TELA FINAL DA FOTO */
     #imagem-final {
-      display: none;
       position: fixed;
       inset: 0;
+      display: flex;
       justify-content: center;
       align-items: center;
-      padding: 24px;
-      background: #050505;
-      z-index: 5;
+      padding: 16px;
       opacity: 0;
-      transition: opacity 1.2s ease;
+      visibility: hidden;
+      transition: opacity 1.2s ease, visibility 1.2s ease;
     }
 
     #imagem-final.visivel {
       opacity: 1;
+      visibility: visible;
     }
 
-    /* FOTO INTERATIVA */
     .foto-container {
       position: relative;
       display: inline-block;
-      max-width: 90vw;
+      max-width: 100%;
       max-height: 75vh;
-      line-height: 0;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      border-radius: 16px;
       overflow: hidden;
-      transition: box-shadow 0.7s ease;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(170, 70, 255, 0.25);
     }
 
     .foto-container img {
       display: block;
-      max-width: 90vw;
+      max-width: 100%;
       max-height: 75vh;
       width: auto;
       height: auto;
       object-fit: contain;
-      border-radius: 16px;
-      transition: filter 0.7s ease;
+      transition: filter 0.8s ease;
     }
 
-    /* CAMADA ROXA */
     .camada-roxa {
       position: absolute;
       inset: 0;
-      background: rgba(145, 40, 255, 0.78);
+      z-index: 1;
+      background: rgba(145, 40, 255, 0.55);
       mix-blend-mode: color;
       opacity: 0;
+      transition: opacity 0.8s ease;
       pointer-events: none;
-      transition: opacity 0.7s ease;
     }
 
-    /* LUZ ROXA AO REDOR DA FOTO */
-    .foto-container.efeito-ativo {
+    .glitters {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      overflow: hidden;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    .glitter {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      background: #fff;
+      border-radius: 50%;
       box-shadow:
-        0 0 18px #a855f7,
-        0 0 40px rgba(168, 85, 247, 0.8),
-        0 0 70px rgba(128, 40, 255, 0.45);
+        0 0 6px 2px #fff,
+        0 0 12px 4px #d9a3ff;
+      animation: pulsar 1.8s ease-in-out infinite;
+    }
+
+    @keyframes pulsar {
+      0%, 100% {
+        opacity: 0.25;
+        transform: scale(0.6);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.5);
+      }
+    }
+
+    .mensagem-romantica {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: clamp(14px, 4vw, 28px);
+      overflow-y: auto;
+      background: rgba(35, 0, 65, 0.62);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+      pointer-events: auto;
+      overscroll-behavior: contain;
+    }
+
+    .mensagem-romantica p {
+      color: #fff;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(14px, 3.8vw, 19px);
+      line-height: 1.65;
+      text-align: center;
+      text-shadow:
+        0 0 8px rgba(200, 150, 255, 0.55),
+        0 1px 4px rgba(0, 0, 0, 0.9);
+      max-width: 440px;
+      margin: auto;
     }
 
     .foto-container.efeito-ativo .camada-roxa {
       opacity: 1;
     }
 
-    /* BRILHOS PULSANTES */
-    .glitters {
-      position: absolute;
-      inset: 0;
-      overflow: hidden;
-      pointer-events: none;
-    }
-
-    .glitter {
-      position: absolute;
-      color: #fff;
-      font-size: 17px;
-      line-height: 1;
-      opacity: 0;
-      text-shadow:
-        0 0 5px #fff,
-        0 0 12px #d8a5ff,
-        0 0 22px #a020f0;
-      animation: cintilar var(--tempo) ease-in-out infinite;
-      animation-delay: var(--atraso);
-    }
-
-    @keyframes cintilar {
-      0%, 100% {
-        opacity: 0.1;
-        transform: scale(0.4) rotate(0deg);
-      }
-
-      50% {
-        opacity: 1;
-        transform: scale(1.5) rotate(45deg);
-      }
-    }
-
-    .foto-container.efeito-ativo .glitter {
-      opacity: 0.8;
-    }
-
-    /* INSTRUÇÃO */
-    .dica {
-      position: fixed;
-      bottom: 35px;
-      color: #777;
-      font-size: 13px;
-      letter-spacing: 2px;
-      transition: opacity 0.5s;
-    }
-
-    /* INSTRUÇÃO DA FOTO */
-    #dica-foto {
-      display: none;
-      position: fixed;
-      bottom: 25px;
-      color: #c9a3ff;
-      font-size: 12px;
-      letter-spacing: 1.5px;
-      text-align: center;
-      z-index: 6;
-      opacity: 0;
-      transition: opacity 1s ease;
-    }
-
-    #dica-foto.visivel {
+    .foto-container.efeito-ativo .glitters {
       opacity: 1;
+    }
+
+    .foto-container.efeito-ativo .mensagem-romantica {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .particula {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      pointer-events: none;
+      z-index: 10;
+      animation: explodir var(--duracao) ease-out forwards;
+    }
+
+    @keyframes explodir {
+      0% {
+        transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform:
+          translate(
+            calc(-50% + var(--x)),
+            calc(-50% + var(--y))
+          )
+          scale(0)
+          rotate(var(--rotacao));
+        opacity: 0;
+      }
     }
   </style>
 </head>
@@ -213,140 +203,104 @@
         src="img/IMG_2364.jpeg"
         alt="Espero que se lembre de mim com amor"
       >
+
       <div class="camada-roxa"></div>
       <div class="glitters"></div>
+
+      <div class="mensagem-romantica">
+        <p>
+          Espero que se lembre de nós como pessoas boa vivendo um romance
+          de comédia, que se lembre de nós como apenas dois adolescentes
+          rindo, espero que me veja não como alguém que você deva se prender,
+          mas sim alguém que você ama e soma…
+          Espero que não me veja como minha pior fase.
+        </p>
+      </div>
     </div>
   </div>
-
-  <div class="dica" id="dica">TOQUE NAS PALAVRAS</div>
-  <div id="dica-foto">TOQUE NA FOTO PARA REVELAR A MAGIA ✨</div>
 
   <script>
     const frase = document.getElementById("frase");
     const imagemFinal = document.getElementById("imagem-final");
-    const dica = document.getElementById("dica");
-    const dicaFoto = document.getElementById("dica-foto");
-    const foto = document.getElementById("foto-interativa");
-    const areaGlitters = foto.querySelector(".glitters");
+    const fotoInterativa = document.getElementById("foto-interativa");
+    const glitters = document.querySelector(".glitters");
 
-    let animando = false;
+    let iniciado = false;
 
-    // Cria os glitters uma única vez
+    // Cria os 32 brilhos que ficam sobre a imagem.
     for (let i = 0; i < 32; i++) {
       const glitter = document.createElement("span");
+      glitter.classList.add("glitter");
 
-      glitter.className = "glitter";
-      glitter.textContent = Math.random() > 0.5 ? "✦" : "✧";
+      glitter.style.left = Math.random() * 100 + "%";
+      glitter.style.top = Math.random() * 100 + "%";
+      glitter.style.animationDelay = Math.random() * 2 + "s";
+      glitter.style.animationDuration = (1.2 + Math.random() * 1.5) + "s";
 
-      glitter.style.left = (5 + Math.random() * 90) + "%";
-      glitter.style.top = (5 + Math.random() * 90) + "%";
-      glitter.style.fontSize = (10 + Math.random() * 15) + "px";
-
-      glitter.style.setProperty(
-        "--tempo",
-        (1 + Math.random() * 2) + "s"
-      );
-
-      glitter.style.setProperty(
-        "--atraso",
-        (Math.random() * 3) + "s"
-      );
-
-      areaGlitters.appendChild(glitter);
+      glitters.appendChild(glitter);
     }
 
-    // Clicar na frase dispara a explosão
+    // Ao tocar em "Eu te amo", cria a explosão de partículas.
     frase.addEventListener("click", () => {
-      if (animando) return;
+      if (iniciado) return;
+      iniciado = true;
 
-      animando = true;
+      frase.style.opacity = "0";
+      frase.style.transform = "scale(0.7)";
+      frase.style.pointerEvents = "none";
 
-      const ret = frase.getBoundingClientRect();
-      const centroX = ret.left + ret.width / 2;
-      const centroY = ret.top + ret.height / 2;
+      setTimeout(() => {
+        frase.style.display = "none";
+      }, 800);
 
-      frase.style.visibility = "hidden";
-      dica.style.opacity = "0";
-
-      const cores = [
-        "#ff4d79",
-        "#ffcf70",
-        "#ffffff",
-        "#c084fc",
-        "#ff85d5",
-        "#7df9d4"
-      ];
-
-      // Cria 180 partículas coloridas
+      // Explosão de 180 corações e partículas.
       for (let i = 0; i < 180; i++) {
-        const p = document.createElement("span");
+        const particula = document.createElement("span");
+        particula.classList.add("particula");
 
-        p.className = "confete";
-        p.textContent = Math.random() > 0.7 ? "♥" : "▪";
-
-        p.style.color =
-          cores[Math.floor(Math.random() * cores.length)];
-
-        p.style.fontSize =
-          (Math.random() * 10 + 5) + "px";
-
-        p.style.left = centroX + "px";
-        p.style.top = centroY + "px";
+        particula.textContent = Math.random() > 0.45 ? "💜" : "♥";
+        particula.style.fontSize = (10 + Math.random() * 22) + "px";
 
         const angulo = Math.random() * Math.PI * 2;
-
-        const distancia =
-          80 + Math.random() *
-          Math.max(window.innerWidth, window.innerHeight) * 0.55;
+        const distancia = 100 + Math.random() * Math.max(
+          window.innerWidth,
+          window.innerHeight
+        ) * 0.65;
 
         const x = Math.cos(angulo) * distancia;
+        const y = Math.sin(angulo) * distancia;
+        const duracao = 2.5 + Math.random() * 2;
 
-        // Gravidade faz os confetes caírem
-        const y =
-          Math.sin(angulo) * distancia +
-          100 + Math.random() * 180;
+        particula.style.setProperty("--x", x + "px");
+        particula.style.setProperty("--y", y + "px");
+        particula.style.setProperty("--rotacao", (Math.random() * 720 - 360) + "deg");
+        particula.style.setProperty("--duracao", duracao + "s");
 
-        p.style.setProperty("--x", x + "px");
-        p.style.setProperty("--y", y + "px");
+        document.body.appendChild(particula);
 
-        p.style.setProperty(
-          "--giro",
-          (Math.random() * 900 - 450) + "deg"
-        );
-
-        p.style.setProperty(
-          "--duracao",
-          (2.5 + Math.random() * 2) + "s"
-        );
-
-        document.body.appendChild(p);
-
-        p.addEventListener("animationend", () => {
-          p.remove();
-        });
+        setTimeout(() => {
+          particula.remove();
+        }, duracao * 1000);
       }
 
-      // Mostra a foto após a explosão
+      // Mostra a foto depois da explosão.
       setTimeout(() => {
-        imagemFinal.style.display = "flex";
-
-        requestAnimationFrame(() => {
-          imagemFinal.classList.add("visivel");
-        });
-
-        dicaFoto.style.display = "block";
-
-        requestAnimationFrame(() => {
-          dicaFoto.classList.add("visivel");
-        });
+        imagemFinal.classList.add("visivel");
       }, 4600);
     });
 
-    // Tocar na foto liga ou desliga o efeito roxo
-    foto.addEventListener("click", () => {
-      foto.classList.toggle("efeito-ativo");
+    // Ao tocar na foto, ativa ou desativa o efeito roxo e a mensagem.
+    fotoInterativa.addEventListener("click", (evento) => {
+      evento.stopPropagation();
+      fotoInterativa.classList.toggle("efeito-ativo");
+    });
+
+    // Evita que tocar ou rolar o texto feche o efeito acidentalmente.
+    document.querySelector(".mensagem-romantica").addEventListener("click", (evento) => {
+      evento.stopPropagation();
     });
   </script>
 
 </body>
 </html>
+```

@@ -23,6 +23,7 @@
       font-family: Arial, sans-serif;
     }
 
+    /* FRASE INICIAL */
     #frase {
       color: white;
       font-size: clamp(38px, 10vw, 65px);
@@ -40,6 +41,7 @@
       transform: scale(0.92);
     }
 
+    /* EXPLOSÃO DOS CONFETES */
     .confete {
       position: fixed;
       display: block;
@@ -67,6 +69,7 @@
       }
     }
 
+    /* TELA FINAL DA FOTO */
     #imagem-final {
       display: none;
       position: fixed;
@@ -84,14 +87,93 @@
       opacity: 1;
     }
 
-    #imagem-final img {
-      max-width: 90%;
+    /* FOTO INTERATIVA */
+    .foto-container {
+      position: relative;
+      display: inline-block;
+      max-width: 90vw;
       max-height: 75vh;
-      object-fit: contain;
+      line-height: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
       border-radius: 16px;
-      box-shadow: 0 0 30px rgba(255, 100, 160, 0.25);
+      overflow: hidden;
+      transition: box-shadow 0.7s ease;
     }
 
+    .foto-container img {
+      display: block;
+      max-width: 90vw;
+      max-height: 75vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 16px;
+      transition: filter 0.7s ease;
+    }
+
+    /* CAMADA ROXA */
+    .camada-roxa {
+      position: absolute;
+      inset: 0;
+      background: rgba(145, 40, 255, 0.78);
+      mix-blend-mode: color;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.7s ease;
+    }
+
+    /* LUZ ROXA AO REDOR DA FOTO */
+    .foto-container.efeito-ativo {
+      box-shadow:
+        0 0 18px #a855f7,
+        0 0 40px rgba(168, 85, 247, 0.8),
+        0 0 70px rgba(128, 40, 255, 0.45);
+    }
+
+    .foto-container.efeito-ativo .camada-roxa {
+      opacity: 1;
+    }
+
+    /* BRILHOS PULSANTES */
+    .glitters {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .glitter {
+      position: absolute;
+      color: #fff;
+      font-size: 17px;
+      line-height: 1;
+      opacity: 0;
+      text-shadow:
+        0 0 5px #fff,
+        0 0 12px #d8a5ff,
+        0 0 22px #a020f0;
+      animation: cintilar var(--tempo) ease-in-out infinite;
+      animation-delay: var(--atraso);
+    }
+
+    @keyframes cintilar {
+      0%, 100% {
+        opacity: 0.1;
+        transform: scale(0.4) rotate(0deg);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(1.5) rotate(45deg);
+      }
+    }
+
+    .foto-container.efeito-ativo .glitter {
+      opacity: 0.8;
+    }
+
+    /* INSTRUÇÃO */
     .dica {
       position: fixed;
       bottom: 35px;
@@ -99,6 +181,24 @@
       font-size: 13px;
       letter-spacing: 2px;
       transition: opacity 0.5s;
+    }
+
+    /* INSTRUÇÃO DA FOTO */
+    #dica-foto {
+      display: none;
+      position: fixed;
+      bottom: 25px;
+      color: #c9a3ff;
+      font-size: 12px;
+      letter-spacing: 1.5px;
+      text-align: center;
+      z-index: 6;
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    #dica-foto.visivel {
+      opacity: 1;
     }
   </style>
 </head>
@@ -108,21 +208,54 @@
   <div id="frase">Eu te amo</div>
 
   <div id="imagem-final">
-    <img
-      src="img/IMG_2364.jpeg"
-      alt="Espero que se lembre de mim com amor"
-    >
+    <div class="foto-container" id="foto-interativa">
+      <img
+        src="img/IMG_2364.jpeg"
+        alt="Espero que se lembre de mim com amor"
+      >
+      <div class="camada-roxa"></div>
+      <div class="glitters"></div>
+    </div>
   </div>
 
   <div class="dica" id="dica">TOQUE NAS PALAVRAS</div>
+  <div id="dica-foto">TOQUE NA FOTO PARA REVELAR A MAGIA ✨</div>
 
   <script>
     const frase = document.getElementById("frase");
     const imagemFinal = document.getElementById("imagem-final");
     const dica = document.getElementById("dica");
+    const dicaFoto = document.getElementById("dica-foto");
+    const foto = document.getElementById("foto-interativa");
+    const areaGlitters = foto.querySelector(".glitters");
 
     let animando = false;
 
+    // Cria os glitters uma única vez
+    for (let i = 0; i < 32; i++) {
+      const glitter = document.createElement("span");
+
+      glitter.className = "glitter";
+      glitter.textContent = Math.random() > 0.5 ? "✦" : "✧";
+
+      glitter.style.left = (5 + Math.random() * 90) + "%";
+      glitter.style.top = (5 + Math.random() * 90) + "%";
+      glitter.style.fontSize = (10 + Math.random() * 15) + "px";
+
+      glitter.style.setProperty(
+        "--tempo",
+        (1 + Math.random() * 2) + "s"
+      );
+
+      glitter.style.setProperty(
+        "--atraso",
+        (Math.random() * 3) + "s"
+      );
+
+      areaGlitters.appendChild(glitter);
+    }
+
+    // Clicar na frase dispara a explosão
     frase.addEventListener("click", () => {
       if (animando) return;
 
@@ -132,7 +265,6 @@
       const centroX = ret.left + ret.width / 2;
       const centroY = ret.top + ret.height / 2;
 
-      // Esconde a frase durante a explosão
       frase.style.visibility = "hidden";
       dica.style.opacity = "0";
 
@@ -145,11 +277,11 @@
         "#7df9d4"
       ];
 
-      // Cria os confetes
+      // Cria 180 partículas coloridas
       for (let i = 0; i < 180; i++) {
         const p = document.createElement("span");
-        p.className = "confete";
 
+        p.className = "confete";
         p.textContent = Math.random() > 0.7 ? "♥" : "▪";
 
         p.style.color =
@@ -169,7 +301,7 @@
 
         const x = Math.cos(angulo) * distancia;
 
-        // Gravidade: os confetes tendem a cair
+        // Gravidade faz os confetes caírem
         const y =
           Math.sin(angulo) * distancia +
           100 + Math.random() * 180;
@@ -194,14 +326,25 @@
         });
       }
 
-      // Espera a explosão terminar e mostra a imagem
+      // Mostra a foto após a explosão
       setTimeout(() => {
         imagemFinal.style.display = "flex";
 
         requestAnimationFrame(() => {
           imagemFinal.classList.add("visivel");
         });
+
+        dicaFoto.style.display = "block";
+
+        requestAnimationFrame(() => {
+          dicaFoto.classList.add("visivel");
+        });
       }, 4600);
+    });
+
+    // Tocar na foto liga ou desliga o efeito roxo
+    foto.addEventListener("click", () => {
+      foto.classList.toggle("efeito-ativo");
     });
   </script>
 

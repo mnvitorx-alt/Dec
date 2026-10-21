@@ -40,6 +40,33 @@
       transform: scale(0.92);
     }
 
+    
+#imagem-final {
+  display: none;
+  position: fixed;
+  inset: 0;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  background: #050505;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+#imagem-final.visivel {
+  display: flex;
+  opacity: 1;
+}
+
+#imagem-final img {
+  max-width: 90%;
+  max-height: 75vh;
+  object-fit: contain;
+  border-radius: 16px;
+  box-shadow: 0 0 30px rgba(255, 100, 160, 0.25);
+}
+
     .confete {
       position: absolute;
       left: 0;
@@ -77,8 +104,13 @@
 </head>
 
 <body>
-  <div id="frase">Eu te amo</div>
-  <div class="dica">TOQUE NAS PALAVRAS</div>
+<div id="frase">Eu te amo</div>
+
+<div id="imagem-final">
+  <img src="img/IMG_2364.jpeg" alt="Espero que se lembre de mim com amor">
+</div>
+
+<div class="dica">TOQUE NAS PALAVRAS</div>
 
   <script>
     const frase = document.getElementById("frase");
@@ -128,8 +160,16 @@
         p.addEventListener("animationend", () => p.remove());
       }
 
-      setTimeout(() => {
-        frase.style.visibility = "visible";
+      
+setTimeout(() => {
+  const imagemFinal = document.getElementById("imagem-final");
+
+  imagemFinal.style.display = "flex";
+
+  requestAnimationFrame(() => {
+    imagemFinal.classList.add("visivel");
+  });
+}, 4600);
         frase.style.animation = "nenhuma";
         animando = false;
       }, 4600);

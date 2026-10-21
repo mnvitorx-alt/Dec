@@ -1,0 +1,139 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eu te amo ❤️</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #050505;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+
+    #frase {
+      color: white;
+      font-size: clamp(38px, 10vw, 65px);
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      text-shadow: 0 0 15px rgba(255,255,255,0.25);
+      transition: transform 0.2s, opacity 0.2s;
+      position: relative;
+      z-index: 2;
+    }
+
+    #frase:active {
+      transform: scale(0.92);
+    }
+
+    .confete {
+      position: absolute;
+      left: 0;
+      top: 0;
+      pointer-events: none;
+      will-change: transform, opacity;
+      animation: explodir var(--duracao) ease-out forwards;
+    }
+
+    @keyframes explodir {
+      0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 1;
+      }
+      25% {
+        opacity: 1;
+      }
+      100% {
+        transform: translate(
+          var(--x),
+          var(--y)
+        ) rotate(var(--giro));
+        opacity: 0;
+      }
+    }
+
+    .dica {
+      position: fixed;
+      bottom: 35px;
+      color: #777;
+      font-size: 13px;
+      letter-spacing: 2px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="frase">Eu te amo</div>
+  <div class="dica">TOQUE NAS PALAVRAS</div>
+
+  <script>
+    const frase = document.getElementById("frase");
+    let animando = false;
+
+    frase.addEventListener("click", () => {
+      if (animando) return;
+      animando = true;
+
+      const ret = frase.getBoundingClientRect();
+      const centroX = ret.left + ret.width / 2;
+      const centroY = ret.top + ret.height / 2;
+
+      frase.style.visibility = "hidden";
+
+      const cores = [
+        "#ff4d79", "#ffcf70", "#ffffff",
+        "#c084fc", "#ff85d5", "#7df9d4"
+      ];
+
+      for (let i = 0; i < 180; i++) {
+        const p = document.createElement("span");
+        p.className = "confete";
+        p.textContent = Math.random() > 0.7 ? "♥" : "▪";
+        p.style.color = cores[
+          Math.floor(Math.random() * cores.length)
+        ];
+        p.style.fontSize = (Math.random() * 10 + 5) + "px";
+        p.style.left = centroX + "px";
+        p.style.top = centroY + "px";
+
+        const angulo = Math.random() * Math.PI * 2;
+        const distancia = 80 + Math.random() * Math.max(
+          window.innerWidth, window.innerHeight
+        ) * 0.55;
+
+        const x = Math.cos(angulo) * distancia;
+        const y = Math.sin(angulo) * distancia
+          + 100 + Math.random() * 180;
+
+        p.style.setProperty("--x", x + "px");
+        p.style.setProperty("--y", y + "px");
+        p.style.setProperty("--giro", (Math.random() * 900 - 450) + "deg");
+        p.style.setProperty("--duracao", (2.5 + Math.random() * 2) + "s");
+
+        document.body.appendChild(p);
+        p.addEventListener("animationend", () => p.remove());
+      }
+
+      setTimeout(() => {
+        frase.style.visibility = "visible";
+        frase.style.animation = "nenhuma";
+        animando = false;
+      }, 4600);
+    });
+  </script>
+</body>
+</html>

@@ -115,11 +115,6 @@
       overflow-wrap: break-word;
     }
 
-    #foto-pergunta {
-    filter: blur(3px);
-    transition: filter 0.5s ease;
-}
-
     #alternativas {
       width: 100%;
       max-width: 850px;
@@ -165,6 +160,8 @@
       object-fit: contain;
       margin: 0 auto;
       border-radius: 8px;
+      filter: blur(3px);
+      transition: filter 0.5s ease;
     }
 
     #instrucao {
@@ -282,12 +279,11 @@
     const alternativas = document.querySelectorAll(".alternativa");
     const instrucao = document.getElementById("instrucao");
     const foto = document.getElementById("foto-pergunta");
-    foto.style.filter = "blur(3px)";
     const mensagemFinal = document.getElementById("mensagem-final");
     const pontuacao = document.getElementById("pontuacao");
 
-    // TODAS AS PERGUNTAS E SUAS FOTOS
-    // Confira se os nomes dos arquivos são iguais aos do GitHub.
+    // PERGUNTAS E FOTOS
+    // Os nomes dos arquivos devem corresponder aos do GitHub.
 
     const perguntas = [
       {
@@ -376,7 +372,7 @@
         botao.disabled = false;
       });
 
-      // A foto muda automaticamente em cada pergunta.
+      // Mostrar erro no console se a imagem não carregar.
       foto.onerror = function () {
         console.error(
           "Não foi possível carregar a imagem. Confira o caminho:",
@@ -384,8 +380,10 @@
         );
       };
 
+      // Carregar a foto e começar sempre com desfoque.
       foto.src = atual.foto;
       foto.alt = "Foto da lembrança " + (indiceAtual + 1);
+      foto.style.filter = "blur(3px)";
 
       instrucao.textContent = "Escolha a resposta que você lembra.";
       botaoProximo.classList.add("escondido");
@@ -400,6 +398,7 @@
 
     alternativas.forEach(function (botao) {
       botao.addEventListener("click", function () {
+        // Impedir que a pessoa escolha mais de uma resposta.
         if (respostaEscolhida !== null) {
           return;
         }
@@ -407,10 +406,12 @@
         respostaEscolhida = botao.dataset.opcao;
 
         alternativas.forEach(function (opcao) {
-          foto.style.filter = "blur(0px)";
           opcao.disabled = true;
           opcao.classList.remove("selecionada");
         });
+
+        // Revelar a foto suavemente após escolher a resposta.
+        foto.style.filter = "blur(0px)";
 
         botao.classList.add("selecionada");
 
@@ -476,7 +477,7 @@
       escreverDialogo();
     });
 
-    // INICIAR A INTRODUÇÃO ASSIM QUE O SCRIPT CARREGAR
+    // INICIAR A INTRODUÇÃO AO CARREGAR A PÁGINA
 
     escreverDialogo();
   </script>

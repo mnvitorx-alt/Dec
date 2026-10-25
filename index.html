@@ -1,10 +1,14 @@
-
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nossas Memórias</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
   <style>
     * {
@@ -16,24 +20,27 @@
       min-height: 100vh;
       background: #000;
       color: #fff;
-      font-family: "Courier New", monospace;
+      font-family: "Press Start 2P", monospace;
+
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 24px;
+
+      padding: 25px;
     }
 
     .tela {
       width: 100%;
-      max-width: 700px;
-      text-align: left;
+      max-width: 900px;
+      text-align: center;
     }
 
     #dialogo {
-      font-size: clamp(18px, 4vw, 25px);
-      line-height: 1.8;
-      white-space: pre-wrap;
-      min-height: 150px;
+      font-size: clamp(12px, 2.5vw, 18px);
+      line-height: 2.2;
+      text-align: center;
+      min-height: 180px;
+      overflow-wrap: break-word;
     }
 
     #cursor {
@@ -49,13 +56,17 @@
 
     #botao {
       display: none;
-      margin-top: 30px;
-      padding: 14px 18px;
+      margin: 25px auto 0;
+      padding: 18px 14px;
+
       background: #000;
       color: #fff;
       border: 2px solid #fff;
-      font-family: inherit;
-      font-size: clamp(14px, 3.5vw, 18px);
+
+      font-family: "Press Start 2P", monospace;
+      font-size: clamp(9px, 2vw, 13px);
+      line-height: 1.8;
+
       cursor: pointer;
       text-align: center;
     }
@@ -68,7 +79,7 @@
     }
 
     #botao.visivel {
-      display: inline-block;
+      display: block;
     }
   </style>
 </head>
@@ -107,8 +118,9 @@
     escreverDialogo();
 
     botao.addEventListener("click", () => {
-      // A próxima tela será adicionada aqui.
+      // A próxima tela do quiz será adicionada aqui.
     });
   </script>
 </body>
 </html>
+```

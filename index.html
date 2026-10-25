@@ -115,6 +115,15 @@
       overflow-wrap: break-word;
     }
 
+    #foto-pergunta {
+    display: none;
+    width: min(85%, 420px);
+    max-height: 350px;
+    object-fit: contain;
+    margin: 20px auto;
+    border-radius: 8px;
+}
+
     /* ALTERNATIVAS HORIZONTAIS */
 
     #alternativas {
@@ -245,9 +254,8 @@
     </div>
 
     <div id="area-foto">
-      <div id="foto-reservada">
-        <img src="img/foto1.jpeg" alt="Nossa lembrança">
-      </div>
+    <img id="foto-pergunta" src="" alt="Foto da nossa lembrança">
+</div>
     </div>
 
     <p id="instrucao">Escolha a resposta que você lembra.</p>
@@ -281,7 +289,10 @@
     const cursor = document.getElementById("cursor");
     const telaInicial = document.getElementById("tela-inicial");
     const botaoInicio = document.getElementById("botao-inicio");
+    const foto = document.getElementById("foto-pergunta");
 
+          foto.src = perguntas[indiceAtual].foto;
+          foto.style.display = "block";
     let indiceTexto = 0;
     let temporizadorDigitacao;
 
@@ -298,29 +309,39 @@
     }
 
     // PERGUNTAS DO QUIZ
-    // Troque os exemplos pelas lembranças reais de vocês.
 
     const perguntas = [
       {
         pergunta: "Onde foi o nosso primeiro date?",
-        A: "Cinema",
+        A: "Shopping",
         B: "Parque",
-        C: "Shopping",
+        C: "Sorveteria",
         correta: "A"
+        foto: "img/foto1.jpeg"
       },
       {
         pergunta: "O que mais marcou aquele momento?",
         A: "Nossa conversa",
-        B: "As risadas",
+        B: "Filme juntos",
         C: "O lugar",
         correta: "B"
+        foto: "img/foto1.jpeg"
       },
       {
-        pergunta: "Como você se sentiu naquele dia?",
-        A: "Feliz",
-        B: "Nervosa",
-        C: "Com vergonha",
-        correta: "A"
+        pergunta: "para onde saimos no nosso segundo date?",
+        A: "Praia",
+        B: "Pizzaria",
+        C: "Parque",
+        correta: "B"
+        foto: "img/foto1.jpeg"
+      },
+      {
+        pergunta: "para onde saimos no nosso date com meus pais?",
+        A: "Praia",
+        B: "Morro de areia",
+        C: "parque",
+        correta: "B"
+        foto: "img/IMG_2364.jpeg"
       }
     ];
 

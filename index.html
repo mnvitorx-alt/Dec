@@ -38,7 +38,7 @@
       display: none !important;
     }
 
-    /* TELA INICIAL */
+    /* INTRODUÇÃO */
 
     #tela-inicial {
       max-width: 950px;
@@ -47,9 +47,9 @@
 
     #dialogo {
       width: 100%;
+      min-height: 180px;
       font-size: clamp(12px, 2.5vw, 18px);
       line-height: 2.2;
-      min-height: 180px;
       overflow-wrap: break-word;
     }
 
@@ -92,7 +92,7 @@
       display: block;
     }
 
-    /* TELA DO QUIZ */
+    /* QUIZ */
 
     #tela-quiz {
       justify-content: flex-start;
@@ -109,22 +109,11 @@
     #pergunta {
       width: 100%;
       max-width: 950px;
+      margin: 0 0 30px;
       font-size: clamp(12px, 2.5vw, 18px);
       line-height: 2.2;
-      margin: 0 0 35px;
       overflow-wrap: break-word;
     }
-
-    #foto-pergunta {
-    display: none;
-    width: min(85%, 420px);
-    max-height: 350px;
-    object-fit: contain;
-    margin: 20px auto;
-    border-radius: 8px;
-}
-
-    /* ALTERNATIVAS HORIZONTAIS */
 
     #alternativas {
       width: 100%;
@@ -133,7 +122,7 @@
       flex-direction: row;
       justify-content: center;
       gap: 12px;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
     }
 
     .alternativa {
@@ -151,7 +140,12 @@
       border-color: #ffff00;
     }
 
-    /* ESPAÇO RESERVADO PARA A FOTO */
+    .alternativa:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+
+    /* FOTO DE CADA PERGUNTA */
 
     #area-foto {
       width: 100%;
@@ -159,17 +153,13 @@
       margin: 0 auto 25px;
     }
 
-    #foto-reservada {
+    #foto-pergunta {
+      display: block;
       width: 100%;
-      aspect-ratio: 4 / 3;
-      border: 2px dashed #555;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      color: #888;
-      font-size: 10px;
-      line-height: 2;
+      max-height: 350px;
+      object-fit: contain;
+      margin: 0 auto;
+      border-radius: 8px;
     }
 
     #instrucao {
@@ -186,7 +176,7 @@
       line-height: 1.8;
     }
 
-    /* TELA FINAL */
+    /* RESULTADO FINAL */
 
     #mensagem-final {
       max-width: 800px;
@@ -210,17 +200,13 @@
         padding: 10px 4px;
         font-size: 8px;
       }
-
-      #foto-reservada {
-        aspect-ratio: 1 / 1;
-      }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- PRIMEIRA TELA: SEU DIÁLOGO ORIGINAL -->
+  <!-- PRIMEIRA TELA: DIÁLOGO -->
 
   <main id="tela-inicial" class="tela">
     <div id="dialogo">
@@ -240,22 +226,13 @@
     <h1 id="pergunta"></h1>
 
     <div id="alternativas">
-      <button class="alternativa" data-opcao="A" type="button">
-        A) Resposta A
-      </button>
-
-      <button class="alternativa" data-opcao="B" type="button">
-        B) Resposta B
-      </button>
-
-      <button class="alternativa" data-opcao="C" type="button">
-        C) Resposta C
-      </button>
+      <button class="alternativa" data-opcao="A" type="button"></button>
+      <button class="alternativa" data-opcao="B" type="button"></button>
+      <button class="alternativa" data-opcao="C" type="button"></button>
     </div>
 
     <div id="area-foto">
-    <img id="foto-pergunta" src="" alt="Foto da nossa lembrança">
-</div>
+      <img id="foto-pergunta" src="" alt="Foto da nossa lembrança">
     </div>
 
     <p id="instrucao">Escolha a resposta que você lembra.</p>
@@ -265,7 +242,7 @@
     </button>
   </section>
 
-  <!-- TERCEIRA TELA: FINAL -->
+  <!-- TERCEIRA TELA: RESULTADO -->
 
   <section id="tela-final" class="tela escondido">
     <p id="mensagem-final">
@@ -280,7 +257,7 @@
   </section>
 
   <script>
-    // MENSAGEM ORIGINAL DA PRIMEIRA TELA
+    // MENSAGEM DA INTRODUÇÃO
 
     const mensagem =
       "Eu lembro de cada momento com você, mas quero verificar, você se lembra de cada momento nosso?";
@@ -288,13 +265,67 @@
     const texto = document.getElementById("texto");
     const cursor = document.getElementById("cursor");
     const telaInicial = document.getElementById("tela-inicial");
+    const telaQuiz = document.getElementById("tela-quiz");
+    const telaFinal = document.getElementById("tela-final");
+
     const botaoInicio = document.getElementById("botao-inicio");
+    const botaoProximo = document.getElementById("botao-proximo");
+    const botaoReiniciar = document.getElementById("botao-reiniciar");
+
+    const contador = document.getElementById("contador");
+    const perguntaElemento = document.getElementById("pergunta");
+    const alternativas = document.querySelectorAll(".alternativa");
+    const instrucao = document.getElementById("instrucao");
     const foto = document.getElementById("foto-pergunta");
 
-          foto.src = perguntas[indiceAtual].foto;
-          foto.style.display = "block";
+    const mensagemFinal = document.getElementById("mensagem-final");
+    const pontuacao = document.getElementById("pontuacao");
+
+    // TODAS AS PERGUNTAS E SUAS FOTOS
+    // Confira se os nomes dos arquivos são iguais aos do GitHub.
+
+    const perguntas = [
+      {
+        pergunta: "Onde foi o nosso primeiro date?",
+        A: "Shopping",
+        B: "Parque",
+        C: "Sorveteria",
+        correta: "A",
+        foto: "img/foto1.jpeg"
+      },
+      {
+        pergunta: "O que mais marcou aquele momento?",
+        A: "Nossa conversa",
+        B: "Filme juntos",
+        C: "O lugar",
+        correta: "B",
+        foto: "img/foto2.jpeg"
+      },
+      {
+        pergunta: "Para onde saímos no nosso segundo date?",
+        A: "Praia",
+        B: "Pizzaria",
+        C: "Parque",
+        correta: "B",
+        foto: "img/foto3.jpeg"
+      },
+      {
+        pergunta: "Para onde saímos no nosso date com meus pais?",
+        A: "Praia",
+        B: "Morro de areia",
+        C: "Parque",
+        correta: "B",
+        foto: "img/IMG_2364.jpeg"
+      }
+    ];
+
     let indiceTexto = 0;
-    let temporizadorDigitacao;
+    let temporizadorDigitacao = null;
+    let indiceAtual = 0;
+    let respostaEscolhida = null;
+    let acertos = 0;
+
+    // ESCREVER A INTRODUÇÃO LETRA POR LETRA
 
     function escreverDialogo() {
       if (indiceTexto < mensagem.length) {
@@ -308,63 +339,9 @@
       }
     }
 
-    // PERGUNTAS DO QUIZ
+    // INICIAR O QUIZ
 
-    const perguntas = [
-      {
-        pergunta: "Onde foi o nosso primeiro date?",
-        A: "Shopping",
-        B: "Parque",
-        C: "Sorveteria",
-        correta: "A"
-        foto: "img/foto1.jpeg"
-      },
-      {
-        pergunta: "O que mais marcou aquele momento?",
-        A: "Nossa conversa",
-        B: "Filme juntos",
-        C: "O lugar",
-        correta: "B"
-        foto: "img/foto1.jpeg"
-      },
-      {
-        pergunta: "para onde saimos no nosso segundo date?",
-        A: "Praia",
-        B: "Pizzaria",
-        C: "Parque",
-        correta: "B"
-        foto: "img/foto1.jpeg"
-      },
-      {
-        pergunta: "para onde saimos no nosso date com meus pais?",
-        A: "Praia",
-        B: "Morro de areia",
-        C: "parque",
-        correta: "B"
-        foto: "img/IMG_2364.jpeg"
-      }
-    ];
-
-    const telaQuiz = document.getElementById("tela-quiz");
-    const telaFinal = document.getElementById("tela-final");
-
-    const contador = document.getElementById("contador");
-    const perguntaElemento = document.getElementById("pergunta");
-    const alternativas = document.querySelectorAll(".alternativa");
-    const instrucao = document.getElementById("instrucao");
-    const botaoProximo = document.getElementById("botao-proximo");
-
-    const mensagemFinal = document.getElementById("mensagem-final");
-    const pontuacao = document.getElementById("pontuacao");
-    const botaoReiniciar = document.getElementById("botao-reiniciar");
-
-    let indiceAtual = 0;
-    let respostaEscolhida = null;
-    let acertos = 0;
-
-    // ABRIR O QUIZ AO CLICAR NO BOTÃO INICIAL
-
-    botaoInicio.addEventListener("click", () => {
+    botaoInicio.addEventListener("click", function () {
       telaInicial.classList.add("escondido");
       telaQuiz.classList.remove("escondido");
 
@@ -374,7 +351,7 @@
       mostrarPergunta();
     });
 
-    // CARREGAR A PERGUNTA ATUAL
+    // CARREGAR PERGUNTA, ALTERNATIVAS E FOTO
 
     function mostrarPergunta() {
       respostaEscolhida = null;
@@ -386,13 +363,24 @@
 
       perguntaElemento.textContent = atual.pergunta;
 
-      alternativas.forEach((botao) => {
+      alternativas.forEach(function (botao) {
         const letra = botao.dataset.opcao;
 
         botao.textContent = letra + ") " + atual[letra];
         botao.classList.remove("selecionada");
         botao.disabled = false;
       });
+
+      // A foto muda automaticamente em cada pergunta.
+      foto.onerror = function () {
+        console.error(
+          "Não foi possível carregar a imagem. Confira o caminho:",
+          atual.foto
+        );
+      };
+
+      foto.src = atual.foto;
+      foto.alt = "Foto da lembrança " + (indiceAtual + 1);
 
       instrucao.textContent = "Escolha a resposta que você lembra.";
       botaoProximo.classList.add("escondido");
@@ -403,30 +391,36 @@
           : "[ continuar ]";
     }
 
-    // ESCOLHER A ALTERNATIVA
+    // ESCOLHER UMA ALTERNATIVA
 
-    alternativas.forEach((botao) => {
-      botao.addEventListener("click", () => {
-        if (respostaEscolhida !== null) return;
+    alternativas.forEach(function (botao) {
+      botao.addEventListener("click", function () {
+        if (respostaEscolhida !== null) {
+          return;
+        }
 
         respostaEscolhida = botao.dataset.opcao;
 
-        alternativas.forEach((opcao) => {
+        alternativas.forEach(function (opcao) {
           opcao.disabled = true;
           opcao.classList.remove("selecionada");
         });
 
         botao.classList.add("selecionada");
-        instrucao.textContent = "Resposta escolhida: " + respostaEscolhida;
+
+        instrucao.textContent =
+          "Resposta escolhida: " + respostaEscolhida;
 
         botaoProximo.classList.remove("escondido");
       });
     });
 
-    // IR PARA A PRÓXIMA PERGUNTA
+    // AVANÇAR PARA A PRÓXIMA PERGUNTA
 
-    botaoProximo.addEventListener("click", () => {
-      if (respostaEscolhida === null) return;
+    botaoProximo.addEventListener("click", function () {
+      if (respostaEscolhida === null) {
+        return;
+      }
 
       if (respostaEscolhida === perguntas[indiceAtual].correta) {
         acertos++;
@@ -441,7 +435,7 @@
       }
     });
 
-    // MOSTRAR O RESULTADO FINAL
+    // MOSTRAR RESULTADO FINAL
 
     function mostrarResultado() {
       telaQuiz.classList.add("escondido");
@@ -455,10 +449,13 @@
         " perguntas. O mais importante é tudo que vivemos juntos.";
     }
 
-    // RECOMEÇAR DESDE A TELA INICIAL
+    // RECOMEÇAR DESDE A INTRODUÇÃO
 
-    botaoReiniciar.addEventListener("click", () => {
+    botaoReiniciar.addEventListener("click", function () {
+      clearTimeout(temporizadorDigitacao);
+
       telaFinal.classList.add("escondido");
+      telaQuiz.classList.add("escondido");
       telaInicial.classList.remove("escondido");
 
       texto.textContent = "";
@@ -468,12 +465,12 @@
       indiceTexto = 0;
       indiceAtual = 0;
       acertos = 0;
+      respostaEscolhida = null;
 
-      clearTimeout(temporizadorDigitacao);
       escreverDialogo();
     });
 
-    // INICIAR O DIÁLOGO
+    // INICIAR A INTRODUÇÃO ASSIM QUE O SCRIPT CARREGAR
 
     escreverDialogo();
   </script>

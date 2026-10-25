@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -114,6 +113,11 @@
       line-height: 2.2;
       overflow-wrap: break-word;
     }
+
+    #foto-pergunta {
+    filter: blur(3px);
+    transition: filter 0.5s ease;
+}
 
     #alternativas {
       width: 100%;
@@ -277,7 +281,7 @@
     const alternativas = document.querySelectorAll(".alternativa");
     const instrucao = document.getElementById("instrucao");
     const foto = document.getElementById("foto-pergunta");
-
+    foto.style.filter = "blur(3px)";
     const mensagemFinal = document.getElementById("mensagem-final");
     const pontuacao = document.getElementById("pontuacao");
 
@@ -402,6 +406,7 @@
         respostaEscolhida = botao.dataset.opcao;
 
         alternativas.forEach(function (opcao) {
+          foto.style.filter = "blur(0px)";
           opcao.disabled = true;
           opcao.classList.remove("selecionada");
         });

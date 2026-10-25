@@ -62,6 +62,7 @@
       border-radius: 12px;
       cursor: pointer;
       box-shadow: 0 0 25px rgba(170, 70, 255, 0.25);
+      transition: opacity 0.35s ease, transform 0.35s ease;
     }
 
     .foto-container img {
@@ -71,7 +72,13 @@
       width: auto;
       height: auto;
       object-fit: contain;
-      transition: filter 0.8s ease;
+    }
+
+    /* A foto desaparece enquanto as partículas explodem. */
+    .foto-container.sumindo {
+      opacity: 0;
+      transform: scale(0.35) rotate(8deg);
+      pointer-events: none;
     }
 
     .camada-roxa {
@@ -112,6 +119,7 @@
         opacity: 0.25;
         transform: scale(0.6);
       }
+
       50% {
         opacity: 1;
         transform: scale(1.5);
@@ -133,7 +141,6 @@
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.8s ease, visibility 0.8s ease;
-      pointer-events: auto;
       overscroll-behavior: contain;
     }
 
@@ -225,8 +232,9 @@
     const glitters = document.querySelector(".glitters");
 
     let iniciado = false;
+    let fotoExplodindo = false;
 
-    // Cria os 32 brilhos que ficam sobre a imagem.
+    // Cria os 32 brilhos da foto.
     for (let i = 0; i < 32; i++) {
       const glitter = document.createElement("span");
       glitter.classList.add("glitter");
@@ -234,32 +242,23 @@
       glitter.style.left = Math.random() * 100 + "%";
       glitter.style.top = Math.random() * 100 + "%";
       glitter.style.animationDelay = Math.random() * 2 + "s";
-      glitter.style.animationDuration = (1.2 + Math.random() * 1.5) + "s";
+      glitter.style.animationDuration =
+        (1.2 + Math.random() * 1.5) + "s";
 
       glitters.appendChild(glitter);
     }
 
-    // Ao tocar em "Eu te amo", cria a explosão de partículas.
-    frase.addEventListener("click", () => {
-      if (iniciado) return;
-      iniciado = true;
-
-      frase.style.opacity = "0";
-      frase.style.transform = "scale(0.7)";
-      frase.style.pointerEvents = "none";
-
-      setTimeout(() => {
-        frase.style.display = "none";
-      }, 800);
-
-      // Explosão de 180 corações e partículas.
-      for (let i = 0; i < 180; i++) {
+    // Função reutilizável para criar uma explosão de partículas.
+    function criarExplosao(centroX, centroY, quantidade = 180) {
+      for (let i = 0; i < quantidade; i++) {
         const particula = document.createElement("span");
         particula.classList.add("particula");
 
         particula.textContent = Math.random() > 0.45 ? "💜" : "♥";
-        particula.style.fontSize = (10 + Math.random() * 22) + "px";
+        particula.style.fontSize =
+          (10 + Math.random() * 22) + "px";
 
+        // Distribui as partículas em todas as direções.
         const angulo = Math.random() * Math.PI * 2;
         const distancia = 100 + Math.random() * Math.max(
           window.innerWidth,
@@ -270,10 +269,19 @@
         const y = Math.sin(angulo) * distancia;
         const duracao = 2.5 + Math.random() * 2;
 
+        particula.style.left = centroX + "px";
+        particula.style.top = centroY + "px";
+
         particula.style.setProperty("--x", x + "px");
         particula.style.setProperty("--y", y + "px");
-        particula.style.setProperty("--rotacao", (Math.random() * 720 - 360) + "deg");
-        particula.style.setProperty("--duracao", duracao + "s");
+        particula.style.setProperty(
+          "--rotacao",
+          (Math.random() * 720 - 360) + "deg"
+        );
+        particula.style.setProperty(
+          "--duracao",
+          duracao + "s"
+        );
 
         document.body.appendChild(particula);
 
@@ -281,22 +289,53 @@
           particula.remove();
         }, duracao * 1000);
       }
+    }
 
-      // Mostra a foto depois da explosão.
+    // PRIMEIRA ANIMAÇÃO: tocar em "Eu te amo".
+    frase.addEventListener("click", () => {
+      if (iniciado) return;
+      iniciado = true;
+
+      frase.style.opacity = "0";
+      frase.style.transform = "scale(0.7)";
+      frase.style.pointerEvents = "none";
+
+      // A explosão começa no centro da tela.
+      criarExplosao(
+        window.innerWidth / 2,
+        window.innerHeight / 2
+      );
+
+      setTimeout(() => {
+        frase.style.display = "none";
+      }, 800);
+
+      // Mostra a foto depois da explosão inicial.
       setTimeout(() => {
         imagemFinal.classList.add("visivel");
       }, 4600);
     });
 
-    // Ao tocar na foto, ativa ou desativa o efeito roxo e a mensagem.
-    fotoInterativa.addEventListener("click", (evento) => {
-      evento.stopPropagation();
-      fotoInterativa.classList.toggle("efeito-ativo");
-    });
+    // SEGUNDA ANIMAÇÃO: tocar na foto faz tudo explodir.
+    fotoInterativa.addEventListener("click", () => {
+      if (fotoExplodindo) return;
+      fotoExplodindo = true;
 
-    // Evita que tocar ou rolar o texto feche o efeito acidentalmente.
-    document.querySelector(".mensagem-romantica").addEventListener("click", (evento) => {
-      evento.stopPropagation();
+      // Descobre o centro real da foto na tela.
+      const retangulo = fotoInterativa.getBoundingClientRect();
+      const centroX = retangulo.left + retangulo.width / 2;
+      const centroY = retangulo.top + retangulo.height / 2;
+
+      // Cria a explosão a partir da posição da foto.
+      criarExplosao(centroX, centroY);
+
+      // Faz a foto, a mensagem e os efeitos desaparecerem.
+      fotoInterativa.classList.add("sumindo");
+
+      // Depois, esconde completamente a camada da imagem.
+      setTimeout(() => {
+        imagemFinal.classList.remove("visivel");
+      }, 400);
     });
   </script>
 

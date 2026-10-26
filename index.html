@@ -73,8 +73,8 @@
       transition: color 0.15s, border-color 0.15s;
     }
 
-    button:hover,
-    button:focus-visible {
+    button:hover:not(:disabled),
+    button:focus-visible:not(:disabled) {
       color: #ffff00;
       border-color: #ffff00;
       outline: none;
@@ -135,14 +135,22 @@
       overflow-wrap: anywhere;
     }
 
+    /* RESPOSTA SELECIONADA */
+
     .alternativa.selecionada {
       color: #ffff00;
       border-color: #ffff00;
+      background: #191900;
     }
 
     .alternativa:disabled {
       cursor: default;
       opacity: 1;
+    }
+
+    .alternativa:disabled:not(.selecionada) {
+      color: #888;
+      border-color: #555;
     }
 
     /* FOTO DE CADA PERGUNTA */
@@ -151,6 +159,8 @@
       width: 100%;
       max-width: 500px;
       margin: 0 auto 25px;
+      overflow: hidden;
+      border-radius: 8px;
     }
 
     #foto-pergunta {
@@ -159,9 +169,16 @@
       max-height: 350px;
       object-fit: contain;
       margin: 0 auto;
-      border-radius: 8px;
-      filter: blur(3px);
-      transition: filter 0.5s ease;
+
+      /* A foto sempre começa borrada. */
+      filter: blur(7px);
+
+      transition: filter 0.8s ease;
+    }
+
+    /* A foto fica nítida após a escolha. */
+    #foto-pergunta.revelada {
+      filter: blur(0);
     }
 
     #instrucao {
@@ -203,6 +220,12 @@
         font-size: 8px;
       }
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      #foto-pergunta {
+        transition: none;
+      }
+    }
   </style>
 </head>
 
@@ -234,7 +257,11 @@
     </div>
 
     <div id="area-foto">
-      <img id="foto-pergunta" src="" alt="Foto da nossa lembrança">
+      <img
+        id="foto-pergunta"
+        src=""
+        alt="Foto da nossa lembrança"
+      >
     </div>
 
     <p id="instrucao">Escolha a resposta que você lembra.</p>
@@ -283,7 +310,6 @@
     const pontuacao = document.getElementById("pontuacao");
 
     // PERGUNTAS E FOTOS
-    // Os nomes dos arquivos devem corresponder aos do GitHub.
 
     const perguntas = [
       {
@@ -364,6 +390,7 @@
 
       perguntaElemento.textContent = atual.pergunta;
 
+      // Liberar todas as alternativas para a nova pergunta.
       alternativas.forEach(function (botao) {
         const letra = botao.dataset.opcao;
 
@@ -372,7 +399,20 @@
         botao.disabled = false;
       });
 
-      // Mostrar erro no console se a imagem não carregar.
+      // Esconder o botão de continuar até escolher uma resposta.
+      botaoProximo.classList.add("escondido");
+
+      botaoProximo.textContent =
+        indiceAtual === perguntas.length - 1
+          ? "[ ver resultado ]"
+          : "[ continuar ]";
+
+      instrucao.textContent = "Escolha a resposta que você lembra.";
+
+      // IMPORTANTE: borrar a foto ANTES de carregar a próxima.
+      foto.classList.remove("revelada");
+      foto.style.filter = "blur(7px)";
+
       foto.onerror = function () {
         console.error(
           "Não foi possível carregar a imagem. Confira o caminho:",
@@ -380,44 +420,47 @@
         );
       };
 
-      // Carregar a foto e começar sempre com desfoque.
+      foto.onload = function () {
+        // Garantir que a nova imagem continue borrada.
+        if (respostaEscolhida === null) {
+          foto.classList.remove("revelada");
+          foto.style.filter = "blur(7px)";
+        }
+      };
+
       foto.src = atual.foto;
       foto.alt = "Foto da lembrança " + (indiceAtual + 1);
-      foto.style.filter = "blur(3px)";
-
-      instrucao.textContent = "Escolha a resposta que você lembra.";
-      botaoProximo.classList.add("escondido");
-
-      botaoProximo.textContent =
-        indiceAtual === perguntas.length - 1
-          ? "[ ver resultado ]"
-          : "[ continuar ]";
     }
 
-    // ESCOLHER UMA ALTERNATIVA
+    // ESCOLHER UMA ÚNICA ALTERNATIVA
 
     alternativas.forEach(function (botao) {
       botao.addEventListener("click", function () {
-        // Impedir que a pessoa escolha mais de uma resposta.
+
+        // Se já escolheu, ignorar novos cliques.
         if (respostaEscolhida !== null) {
           return;
         }
 
+        // Registrar definitivamente a escolha desta pergunta.
         respostaEscolhida = botao.dataset.opcao;
 
+        // Desativar todas as opções e destacar apenas a escolhida.
         alternativas.forEach(function (opcao) {
           opcao.disabled = true;
           opcao.classList.remove("selecionada");
         });
 
-        // Revelar a foto suavemente após escolher a resposta.
-        foto.style.filter = "blur(0px)";
-
         botao.classList.add("selecionada");
+
+        // Revelar a foto somente depois da escolha.
+        foto.classList.add("revelada");
+        foto.style.filter = "blur(0px)";
 
         instrucao.textContent =
           "Resposta escolhida: " + respostaEscolhida;
 
+        // Agora a pessoa pode continuar.
         botaoProximo.classList.remove("escondido");
       });
     });
@@ -477,7 +520,7 @@
       escreverDialogo();
     });
 
-    // INICIAR A INTRODUÇÃO AO CARREGAR A PÁGINA
+    // INICIAR A INTRODUÇÃO
 
     escreverDialogo();
   </script>
